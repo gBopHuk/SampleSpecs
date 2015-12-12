@@ -5,15 +5,21 @@ PWD=$(pwd)
 
 function showdoc()
 {
-	echo -e " -i 	     -- interactive mode"
-	echo -e " -l|--list   -- list of available specs"
-	echo -e " -h|--help   -- show this message"
-	echo -e " -no-args    -- copying a simple.spec by defualt"
+	echo -e "rpmss is a RPM Sample Specs tool\n"
+    echo -e "\$rpmss [options or samplename]"
+	echo -e "options:"
+	echo -e "  -i\t\t-- interactive mode"
+	echo -e "  -l|--list\t-- list of available specs"
+	echo -e "  -h|--help\t-- show this message\n"
+	echo -e "samplename:"
+	echo -e "  Name from \"rpmss --list\""
+	echo -e "  If no name (epmty value)\t-- copying a simple.spec by default in a PWD dir"
 }
+
 function is_spec_exist()
 {
   if [ -f "$SPECSPATH/$spectempl.spec" ];
-	  then echo " You are choose a $spectempl "
+	  then echo " You choosed a $spectempl "
 	  else echo " $spectempl doesn't exist"
 		   exit 1
   fi
@@ -29,8 +35,48 @@ function specs_list()
 {
   if [ -d $SPECSPATH ];
 	  then ls $SPECSPATH | sed 's%\.spec%%'
+	  else echo " SPECSPATH doesn't exist "
+		   exit 1
+  fi
+}
+
+function get_from_list()
+{
+  echo $1
+  #get list of specs
+  if [ -d $SPECSPATH ];
+	  then specslist=$(ls $SPECSPATH | sed 's%\.spec%%')
 	  else echo " SPECSPATH doesn't xist "
 		   exit 1
+  fi
+  
+  #find the spec
+  for i in $specslist; do
+	if [ "$i" == "$1" ]; then
+	   cp $SPECSPATH/$i.spec $PWD && return 0 || return 1
+	fi
+  done
+}
+
+function default_spec()
+{
+  cp $SPECSPATH/simple.spec $PWD
+  echo "$PWD/simple.spec has create"
+}
+
+function cp_choosed_spec()
+{
+  no_spec_in_pwd $spectempl &&\
+	cp $SPECSPATH/$spectempl.spec $PWD && echo "$PWD/$spectempl.spec has create"
+}
+
+function no_spec_in_pwd()
+{
+  if [ -f "$PWD/$1.spec" ];  then
+	echo "$PWD/$1.spec already exist. Move or rm it."
+	return 1
+  else
+	return 0
   fi
 }
 
@@ -40,8 +86,8 @@ case "$1" in
 	-i)
 	    specs_list
 		interactive
-		is_pec_exist
-		cp $SPECSPATH/$spectempl.spec $PWD
+		is_spec_exist
+		cp_choosed_spec 
 		;;
 	-l|--list)
 		specs_list	
@@ -50,7 +96,7 @@ case "$1" in
 		showdoc	
 		;;
 	*)
-		cp $SPECSPATH/$simple.spec $PWD
+	    get_from_list "$1" && default_spec
 esac
 
 exit 0

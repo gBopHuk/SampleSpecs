@@ -2,3 +2,17 @@
 Templates for Altlinux Specs to build rpms
 
 url: http://www.altlinux.org/SampleSpecs
+
+USAGE:
+
+rpmss is a RPM Sample Specs tool
+$rpmss [options or samplename]
+options:
+	 -i 	     -- interactive mode
+	 -l|--list   -- list of available specs
+	 -h|--help   -- show this message
+
+samplename:
+     Name from "rpmss --list"
+	 If no name (epmty value)  -- copying a simple.spec by default in a PWD dir
+  
