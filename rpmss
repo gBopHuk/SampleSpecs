@@ -2,18 +2,32 @@
 
 SPECSPATH=./Templates
 PWD=$(pwd)
+PWDBASENAME=$(basename $PWD)
+VERBOSE=0
 
 function showdoc()
 {
 	echo -e "rpmss is a RPM Sample Specs tool\n"
-    echo -e "\$rpmss [options or samplename]"
+    echo -e "\$rpmss [options] [args] "
 	echo -e "options:"
 	echo -e "  -i\t\t-- interactive mode"
 	echo -e "  -l|--list\t-- list of available specs"
+	echo -e "  -t\t\t-- type of  spec sample. See --list"
+	echo -e "  -o\t\t-- output  of  spec name. Default name is basename of \$(pwd)"
+	echo -e "  -v\t\t-- verbose mode on"
 	echo -e "  -h|--help\t-- show this message\n"
-	echo -e "samplename:"
-	echo -e "  Name from \"rpmss --list\""
-	echo -e "  If no name (epmty value)\t-- copying a simple.spec by default in a PWD dir"
+	echo -e "examples:"
+	echo -e "  \$ rpmss -t cmake -o pack"
+	echo -e "  You choosed a cmake spec" 
+	echo -e "  /home/user/package/pack.spec has create\n"
+	echo -e "  \$ rpmss "
+	echo -e "  Simple spec is choosed" 
+	echo -e "  /home/user/package/pack.spec has create\n"
+	echo -e "  \$ ./rpmss -i -o slib "
+	echo -e "  Please, enter the Name of Spec type: "
+	echo -e "  lib "
+	echo -e "  You choosed a lib "
+	echo -e "  /home/user/package/slib.spec has create "
 }
 
 function is_spec_exist()
@@ -27,8 +41,8 @@ function is_spec_exist()
 
 function interactive()
 {
-  echo " Please, enter the Name of Spec: "
-  read spectempl
+  echo " Please, enter the Name of Spec type: "
+  read -p "Type of spec: " spectempl
 }
 
 function specs_list()
@@ -42,7 +56,15 @@ function specs_list()
 
 function get_from_list()
 {
-  echo $1
+  [ $VERBOSE == 1 ] && echo "TRACE: get_from_list() input: \$1=$1" 
+
+  #check zero line
+  [ -z $1 ] && return 1
+
+  #check alrady exist spec
+  no_spec_in_pwd $PWDBASENAME 
+  [ $? == 1 ] && exit 1
+
   #get list of specs
   if [ -d $SPECSPATH ];
 	  then specslist=$(ls $SPECSPATH | sed 's%\.spec%%')
@@ -50,30 +72,36 @@ function get_from_list()
 		   exit 1
   fi
   
-  #find the spec
+  #find the spec and copy to pwd
   for i in $specslist; do
 	if [ "$i" == "$1" ]; then
-	   cp $SPECSPATH/$i.spec $PWD && return 0 || return 1
+	  copying_spec "$i" "$PWDBASENAME" && return 0 || return 1
 	fi
   done
 }
 
-function default_spec()
+function copying_spec()
 {
-  cp $SPECSPATH/simple.spec $PWD
-  echo "$PWD/simple.spec has create"
-}
+  [ $VERBOSE == 1 ] && echo "TRACE: copying_spec() input: \$1=$1, \$2=$2" 
 
-function cp_choosed_spec()
-{
-  no_spec_in_pwd $spectempl &&\
-	cp $SPECSPATH/$spectempl.spec $PWD && echo "$PWD/$spectempl.spec has create"
+  #check input values
+  if [ -z $1 ] || [ -z $2 ]; then  return 1; fi
+
+  #check already exist spec
+  no_spec_in_pwd $2
+  local retval=$? 
+
+  #if no exist specs then copy $1.spec
+  [ $retval == 0 ] && { cp $SPECSPATH/$1.spec $PWD/$2.spec && echo "$PWD/$2.spec has create"; return 0; }
+  [ $retval == 1 ] && return 1
 }
 
 function no_spec_in_pwd()
 {
+  [ $VERBOSE == 1 ] && echo "TRACE: no_spec_in_pwd() input: \$1=$1" 
+
   if [ -f "$PWD/$1.spec" ];  then
-	echo "$PWD/$1.spec already exist. Move or rm it."
+	echo "$PWD/$1.spec already exist."
 	return 1
   else
 	return 0
@@ -82,12 +110,27 @@ function no_spec_in_pwd()
 
 #main loop
 
+while getopts ":t::o::v" opt; do
+  case $opt in
+	t)
+	  spectempl=$OPTARG
+	  is_spec_exist
+	  ;;
+	o)
+	  PWDBASENAME=$OPTARG
+	  ;;
+	v)
+	  VERBOSE=1
+	  ;;
+  esac
+done 
+
 case "$1" in
 	-i)
 	    specs_list
 		interactive
 		is_spec_exist
-		cp_choosed_spec 
+		copying_spec "$spectempl" "$PWDBASENAME"
 		;;
 	-l|--list)
 		specs_list	
@@ -96,7 +139,9 @@ case "$1" in
 		showdoc	
 		;;
 	*)
-	    get_from_list "$1" && default_spec
+	    get_from_list "$spectempl" ||\
+		{ echo -e "Simple spec is choosed" &&
+		  copying_spec "simple" "$PWDBASENAME"; }
 esac
 
 exit 0

@@ -6,13 +6,27 @@ url: http://www.altlinux.org/SampleSpecs
 USAGE:
 
 rpmss is a RPM Sample Specs tool
-$rpmss [options or samplename]
-options:
-	 -i 	     -- interactive mode
-	 -l|--list   -- list of available specs
-	 -h|--help   -- show this message
 
-samplename:
-     Name from "rpmss --list"
-	 If no name (epmty value)  -- copying a simple.spec by default in a PWD dir
-  
+$rpmss [options] [args] 
+options:
+  -i		-- interactive mode
+  -l|--list	-- list of available specs
+  -t		-- type of  spec sample. See --list
+  -o		-- output  of  spec name. Default name is basename of $(pwd)
+  -v		-- verbose mode on
+  -h|--help	-- show this message
+
+examples:
+  $ rpmss -t cmake -o pack
+  You choosed a cmake spec
+  /home/user/package/pack.spec has create
+
+  $ rpmss 
+  Simple spec is choosed
+  /home/user/package/pack.spec has create
+
+  $ ./rpmss -i -o slib 
+  Please, enter the Name of Spec type: 
+  lib 
+  You choosed a lib 
+  /home/user/package/slib.spec has create
