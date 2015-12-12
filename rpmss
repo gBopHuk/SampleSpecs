@@ -1,0 +1,56 @@
+#!/bin/bash
+
+SPECSPATH=./Templates
+PWD=$(pwd)
+
+function showdoc()
+{
+	echo -e " -i 	     -- interactive mode"
+	echo -e " -l|--list   -- list of available specs"
+	echo -e " -h|--help   -- show this message"
+	echo -e " -no-args    -- copying a simple.spec by defualt"
+}
+function is_spec_exist()
+{
+  if [ -f "$SPECSPATH/$spectempl.spec" ];
+	  then echo " You are choose a $spectempl "
+	  else echo " $spectempl doesn't exist"
+		   exit 1
+  fi
+}
+
+function interactive()
+{
+  echo " Please, enter the Name of Spec: "
+  read spectempl
+}
+
+function specs_list()
+{
+  if [ -d $SPECSPATH ];
+	  then ls $SPECSPATH | sed 's%\.spec%%'
+	  else echo " SPECSPATH doesn't xist "
+		   exit 1
+  fi
+}
+
+#main loop
+
+case "$1" in
+	-i)
+	    specs_list
+		interactive
+		is_pec_exist
+		cp $SPECSPATH/$spectempl.spec $PWD
+		;;
+	-l|--list)
+		specs_list	
+		;;
+	-h|--help)
+		showdoc	
+		;;
+	*)
+		cp $SPECSPATH/$simple.spec $PWD
+esac
+
+exit 0
