@@ -5,28 +5,32 @@ url: http://www.altlinux.org/SampleSpecs
 
 USAGE:
 
-rpmss is a RPM Sample Specs tool
+rpmss is a RPM Sample Specs tool. Creates a sample of rpm-spec file in current directory
 
 $rpmss [options] [args] 
 options:
   -i		-- interactive mode
   -l|--list	-- list of available specs
   -t		-- type of  spec sample. See --list
-  -o		-- output  of  spec name. Default name is basename of $(pwd)
+  -o		-- output name of rpm-spec file. Default name is basename of $(pwd)
   -v		-- verbose mode on
   -h|--help	-- show this message
+args:
+  -t name	-- name of spec sample. See --list
+  -o name	-- name of created rpm-spec file.
 
 examples:
-  $ rpmss -t cmake -o pack
-  You choosed a cmake spec
-  /home/user/package/pack.spec has create
-
   $ rpmss 
   Simple spec is choosed
+  /home/user/package/pack.spec has create
+
+  $ rpmss -t cmake -o pack
+  You choosed a cmake spec
   /home/user/package/pack.spec has create
 
   $ ./rpmss -i -o slib 
   Please, enter the Name of Spec type: 
   lib 
   You choosed a lib 
-  /home/user/package/slib.spec has create
+  /home/user/package/slib.spec has create 
+
