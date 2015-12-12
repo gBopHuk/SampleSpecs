@@ -140,8 +140,7 @@ case "$1" in
 		;;
 	*)
 	    get_from_list "$spectempl" ||\
-		{ echo -e "Simple spec is choosed" &&
-		  copying_spec "simple" "$PWDBASENAME"; }
+		{ echo -e "Simple spec is choosed" && copying_spec "simple" "$PWDBASENAME"; }
 esac
 
 exit 0
