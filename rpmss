@@ -28,7 +28,7 @@ function showdoc()
 	echo -e "  /home/user/package/pack.spec has create\n"
 	echo -e "  \$ ./rpmss -i -o slib "
 	echo -e "  Please, enter the Name of Spec type: "
-	echo -e "  lib "
+	echo -e "  Type of spec: lib"
 	echo -e "  You choosed a lib "
 	echo -e "  /home/user/package/slib.spec has create "
 }

@@ -30,7 +30,7 @@ examples:
 
   $ ./rpmss -i -o slib 
   Please, enter the Name of Spec type: 
-  lib 
+  Type of spec: lib 
   You choosed a lib 
   /home/user/package/slib.spec has create 
 
